@@ -2,3 +2,12 @@ body {
   padding: 10px;
   font-family: sans-serif;
 }
+.game-board {
+  width: 500px;
+  height: 200px;
+  
+}
+.paddle {
+  width: 5px;
+  height: 50px;
+}

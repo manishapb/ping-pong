@@ -1,9 +1,15 @@
 import { Meteor } from 'meteor/meteor';
-import { LinksCollection } from '/imports/api/links';
+import { GameCollection } from '/imports/db/Collections';
+import '/imports/api/userMethods';
+import '/imports/api/gamesMethods'
 
 
-Meteor.startup(async () => {
-  Meteor.publish("links", function () {
-    return LinksCollection.find();
+Meteor.publish("games", function publishGames() {
+  return GameCollection.find({
+          $or : [
+            { 'rightPaddle.player': this.userId },
+            { 'leftPaddle.player': this.userId }
+          ],
+          active: true
   });
 });
