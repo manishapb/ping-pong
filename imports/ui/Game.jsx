@@ -2,10 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Meteor } from 'meteor/meteor';
 
 const paddleHeight = 90;
-const paddleWidth = 5;
 const boardWidth = 400;
 const boardHeight = 160;
-const boardPosition = 200;
 
 const initialball = { t: 0, r:0, speed: {dt: 1, dr: 2} }
 
@@ -73,9 +71,8 @@ const Ball = ({ incScore, leftPaddlePos, rightPaddlePos }) => {
     </figure>);
 }
 
-export const Game = ( { initialGame } ) => {
-    const [ game, setGame ] = useState(initialGame);
-    const [ winner, setWinner ] = useState(null);
+export const Game = ( { game } ) => {
+    // const [ winner, setWinner ] = useState(null);
     const [ leftPaddlePos, setLeftPaddlePos] = useState(50);
     const [ rightPaddlePos, setRightPaddlePos] = useState(80);
     const player = Meteor.userId();
@@ -121,14 +118,9 @@ export const Game = ( { initialGame } ) => {
             if(err)
                 alert(err);
         })
-        if (game.leftPaddle.score >= 10)
-            setWinner(game.leftPaddle.plaer);
-        if (game.rightPaddle.score >= 10)
-            setWinner(game.rightPaddle.player);
-        console.log('inside inc: ', game);
     }
 
-    console.log("game: ", game);
+
 
     const endGame = () => {
         Meteor.call('games.end', game._id, (err, _)=>{
@@ -145,7 +137,7 @@ export const Game = ( { initialGame } ) => {
           <div className='is-pulled-left'>
             <Paddle position={leftPaddlePos} />
           </div>
-          {game.state === 'ended' || game.state === 'waiting'? 
+          {game && (game.state === 'ended' || game.state === 'waiting')? 
             <></> :
             <Ball incScore={updateScore}
                 leftPaddlePos={leftPaddlePos}
@@ -154,10 +146,10 @@ export const Game = ( { initialGame } ) => {
             <Paddle position={rightPaddlePos} />
           </div>
        </div>
-       <div className='container'>
-           {winner? 
-                <div className=''>Game over
-                    <div> Winner: {winner} </div>
+       <div className='container is-family-code'>
+           {game.winner? 
+                <div className='is-size-4 has-text-weight-bold'>Game over
+                    <div> Winner: {game.winner} </div>
                 </div> :
                 <div> 
                     <div>Game id: {game._id} </div>

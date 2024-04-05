@@ -6,8 +6,6 @@ import 'bulma/css/bulma.css';
 import { GameCollection } from '/imports/db/Collections';
 import { useFind, useSubscribe } from 'meteor/react-meteor-data';
 
-const canvasWidth = 400;
-const canvasHeight = 200;
 
 function genstr() {
   return (Math.random() + 1).toString(36).substring(7);
@@ -42,7 +40,7 @@ export const App = () => {
           <>Loading... </> :
           (game && game.active?
             <Game
-                initialGame={game}
+                game={game}
                 player={username}
             /> :
             <Home /> )}

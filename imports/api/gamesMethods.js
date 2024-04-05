@@ -1,11 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { GameCollection } from '/imports/db/Collections';
 
-const paddleHeight = 50;
-const paddleWidth = 4;
-
-const canvasWidth = 400;
-const canvasHeight = 200;
+function getWinner(game) {
+    return game.leftPaddle.score >= 10? 
+                game.leftPaddle.player :
+                (game.rightPaddle.score >= 10 ? game.rightPaddle.player : null); 
+}
 
 Meteor.methods({
     'games.new'() {
@@ -20,13 +20,11 @@ Meteor.methods({
                 player: null,
                 score: 0
             },
-            active: true
+            active: true,
+            winner: null
         });
         let game = GameCollection.findOne({
-            $or:[
-                { "leftPaddle.player" : userId, active: true },
-                { "rightPaddle.player": userId, active: true }
-            ]
+            "leftPaddle.player" : userId, active: true
         });
         return game;
     },
@@ -39,27 +37,31 @@ Meteor.methods({
     'games.end'(gameId) {
         GameCollection.update(
             {_id: gameId},
-            { $set : { active: false}}
+            { $set : { active: false,
+                       state: "ended"}}
         );
     },
     'games.update'(gameId) {
         const game = GameCollection.findOne({_id: gameId});
-
-        let score = (game.leftPaddle.player === this.userId? 
-                        game.leftPaddle.score : game.rightPaddle.score) + 1;
-        let newState = score>=10? "ended" : game.state;
+        let winner = getWinner(game);
+        let newState = winner? "ended" : game.state;
 
         if (game.leftPaddle.player === this.userId) {
+            let score = game.leftPaddle.score + 1;
             GameCollection.update(
                 { _id: gameId },
                 { $set : { "leftPaddle.score" : score,
-                            state : newState }});   
+                            state : newState,
+                            winner: winner }});   
         }
         else if (game.rightPaddle.player === this.userId) {
+            let score = game.rightPaddle.score + 1;
             GameCollection.update(
                 { _id: gameId },
                 { $set : { "rightPaddle.score" : score,
-                            state : newState }});   
+                            state : newState,
+                            winner: winner }});   
         }
+
     } 
 })
