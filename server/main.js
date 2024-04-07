@@ -3,12 +3,11 @@ import { GameCollection } from '/imports/db/Collections';
 import '/imports/api/userMethods';
 import '/imports/api/gamesMethods'
 
-
 Meteor.publish("games", function publishGames() {
   return GameCollection.find({
           $or : [
-            { 'rightPaddle.player': this.userId },
-            { 'leftPaddle.player': this.userId }
+            { player1: this.userId },
+            { player2: this.userId }
           ],
           active: true
   });

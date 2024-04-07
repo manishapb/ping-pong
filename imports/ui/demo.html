@@ -139,14 +139,14 @@
 
             if (keysPressed['ArrowDown']) {
                 if (rightPaddleY < paddleMaxY) {
-                    rightPaddleY = rightPaddleY + boardWidth * 0.01;
+                    rightPaddleY = rightPaddleY + boardHeight * 0.01;
                     if (rightPaddleY > paddleMaxY)
                         rightPaddleY = paddleMaxY;
                     rightPaddle.style.top = rightPaddleY + 'px';
                 }
             } else if (keysPressed['ArrowUp']) {
                 if (rightPaddleY > paddleMinY) {
-                    rightPaddleY = rightPaddleY - boardWidth * 0.01;
+                    rightPaddleY = rightPaddleY - boardHeight * 0.01;
                     if (rightPaddleY < paddleMinY)
                         rightPaddleY = paddleMinY;
                     rightPaddle.style.top = rightPaddleY + 'px';

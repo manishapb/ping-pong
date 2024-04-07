@@ -1,115 +1,139 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
 
-const paddleHeight = 90;
-const boardWidth = 400;
-const boardHeight = 160;
-const UP = -5;
-const DOWN = 5;
+const screenWidth = globalThis.innerWidth;
+const screenHeight = 0.4 * screenWidth;
 
-const Paddle = ({ position, id })=> (
-    <div className='paddle has-background-white' id={id}
-        style={{position: 'relative', top: position}}>
+const boardWidth = 0.8 * screenWidth;
+const boardHeight = 0.7 * screenHeight;
+const boardX = 0.1 * screenWidth;
+const boardY = 0.1 * screenHeight;
+
+const paddleWidth = 0.01 * boardWidth;
+const paddleHeight = 0.25 * boardHeight;
+
+const ballWidth = 0.02 * boardWidth;
+const ballHeight = ballWidth;
+
+const keysPressed = {};
+addEventListener('keydown', e => {
+    keysPressed[e.key] = true;
+});
+addEventListener('keyup', e => {
+    delete keysPressed[e.key];
+});
+
+const endGame = (game) => {
+    Meteor.call('games.end', game._id, err => {
+        if (err)
+            alert(err);
+    });
+}
+
+const Paddle = ({ id, x, y }) => (
+    <div
+        id={id}
+        style={{
+            background: 'white',
+            position: 'absolute',
+            borderRadius: "50%",
+            left: x,
+            top: y,
+            width: paddleWidth,
+            height: paddleHeight
+        }}
+    >
     </div>
 )
 
-const Ball = ({ ball }) => (
-    <figure className='image is-16x16' 
-        style={{position: 'relative', top: ball.top, right: ball.right}}>
-        <img className='is-rounded has-background-white' 
-                src="https://bulma.io/assets/images/placeholders/256x256.png"/>
-    </figure>
+const Ball = ({ x, y }) => (
+    <div
+        id='ball'
+        style={{
+            position: 'absolute',
+            background: 'white',
+            position: 'absolute',
+            borderRadius: "50%",
+            left: x,
+            top: y,
+            width: ballWidth,
+            height: ballHeight
+        }}
+    >
+    </div>
 )
 
+const Board = ({ lPad, rPad, ball }) => (
+    <div
+        id='board'
+        style={{
+            position: 'absolute',
+            border: "1px solid white",
+            left: boardX,
+            top: boardY,
+            width: boardWidth,
+            height: boardHeight
+        }}
+    >
+        <Paddle
+            id="leftPaddle"
+            x={lPad.x * boardWidth}
+            y={lPad.y * boardHeight}
+        />
+        <Paddle
+            id="rightPaddle"
+            x={rPad.x * boardWidth}
+            y={rPad.y * boardHeight}
+        />
+        <Ball
+            x={ball.x * boardWidth}
+            y={ball.y * boardHeight}
+        />
+    </div>
+)
 
-export const Game = ( { game } ) => {
-    const player = Meteor.userId();
-
-    const movePaddleDown = (e)=> {
-        e.preventDefault();
-        if (game.leftPaddle.position <= boardHeight - paddleHeight/2 &&
-            game.leftPaddle.player === player) {
-                updatePaddle(DOWN);
-        }
-        else if (game.rightPaddle.position <= boardHeight - paddleHeight/2 &&
-            game.rightPaddle.player === player) {
-                updatePaddle(DOWN);
-        }
-    }
-
-    const movePaddleUp = (e) => {
-        e.preventDefault();
-        if (game.leftPaddle.position >= 0 &&
-            game.leftPaddle.player === player) {
-                updatePaddle(UP);
-            }
-        else if (game.rightPaddle.position >= 0 && 
-            game.rightPaddle.player === player) {
-                updatePaddle(UP);
-        }
-    }
-
-    const movePaddle = (e) => {
-        e.preventDefault();
-        if (game.state === 'ended')
-            return;
-        if (e.code === 'ArrowUp')
-            movePaddleUp(e);
-        else if (e.code === 'ArrowDown')
-            movePaddleDown(e);
-    }
-
-    const endGame = () => {
-        Meteor.call('games.end', game._id, (err, _)=>{
-            if(err)
-                alert(err);
-        });
-    }
-
-    const updatePaddle = (direction) => {
-        Meteor.call('games.updatePaddle', game._id, direction, ()=> {})
-    }
-
-    const isGameActive = () => {
-        return game && !(game.state === 'ended' || game.state === 'waiting')
-    } 
-
-    // useEffect(update, []);
+export const Game = ({ user, game }) => {
+    const player = game.player1 === user._id ? 1 : 2;
+    const pad = player === 1 ? 'lPad' : 'rPad'; 
+    
+    useEffect(() => {
+        let i = setInterval(() => {
+            if(keysPressed['ArrowDown'] && game.board[pad].velY >= 0)
+                Meteor.call('games.move', 'down', game._id, user._id, player);
+            else if(keysPressed['ArrowUp'] && game.board[pad].velY <= 0)
+                Meteor.call('games.move', 'up', game._id, user._id, player);
+            else if(!keysPressed['ArrowDown'] 
+                 && !keysPressed['ArrowUp'] 
+                 && game.board[pad].velY !== 0)
+                Meteor.call('games.move', 'stop', game._id, user._id, player);
+        }, 200);
+        return () => clearInterval(i);
+    });
 
     return (
-    <div className='container mt-4'>
-       <div className='box game-board'
-            tabIndex="1"
-            onKeyDown={movePaddle}>
-            <div className='is-pulled-left'>
-                <Paddle position={game.leftPaddle.position} />
+        <>
+            <div 
+                style={{
+                    position: 'absolute',
+                    left: boardX,
+                    top: boardY + boardHeight + 5
+                }}
+            >
+                <p>
+                    <b>Game ID: </b> {game._id}
+                </p>
+                <p>
+                    <b>Game state: </b> {game.state}
+                </p>
+                <p>
+                    <b>You are: </b> Player {player}
+                </p>
             </div>
-            <div className='border-left'>
-            </div>
-            {isGameActive?
-                <Ball ball={game.ball} /> : 
-                <></>}
-            <div className='is-pulled-right'>
-                <Paddle position={game.rightPaddle.position} />
-            </div>
-       </div>
-       <div className='container is-family-code is-centered is-size-4 has-text-weight-bold'>
-           {game.winner? 
-                <div>Game over
-                    <div> Winner: 
-                        {game.winner === player? "You win!" : "You Lose!"}
-                    </div>
-                </div> :
-                <div> 
-                    <div>Game id: {game._id} </div>
-                    <div className='is-pulled-left ml-6'> {game.leftPaddle.score}</div>
-                    <div className='is-pulled-right mr-6'> {game.rightPaddle.score}</div>
-                </div>
-            }
-            <div className='is-size-6 mt-4'>
-                <br></br>
-                <button onClick={endGame}>End Game</button>
-            </div>
-       </div>
-    </div>);
+            <Board
+                lPad={game.board.lPad}
+                rPad={game.board.rPad}
+                ball={game.board.ball}
+            />
+        </>
+    );
 }
