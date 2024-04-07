@@ -1,10 +1,11 @@
-import MD from 'meteor/react-meteor-data';
+import { Meteor } from 'meteor/meteor';
+import { useTracker } from 'meteor/react-meteor-data';
 
 export const useSubscribe = (topic, onLoad) => {
-    return MD.useTracker(() => {
-        let isLoading = MD.useSubscribe(topic);
+    return useTracker(() => {
+        let handler = Meteor.subscribe(topic);
         
-        if (isLoading())
+        if (!handler.ready())
             return [true, null];
         else
             return [false, onLoad()];

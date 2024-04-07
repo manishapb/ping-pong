@@ -4,13 +4,15 @@ import { Game } from './Game';
 import { Home } from './Home';
 import 'bulma/css/bulma.css';
 import { GameCollection } from '/imports/db/Collections';
-import { useFind, useSubscribe } from 'meteor/react-meteor-data';
-// import { useSubscribe } from '../ui/hooks/subscribe';
+import { useSubscribe } from '../ui/hooks/subscribe';
 
 
-function genstr() {
+const genstr = () => {
   return (Math.random() + 1).toString(36).substring(7);
 }
+
+const Loading = () => 
+  <div>Loading...</div>;
 
 export const App = () => {
   let usr = genstr();
@@ -24,17 +26,10 @@ export const App = () => {
         Meteor.loginWithPassword(username, username);
     })
   }, [username]);
-  
-  const isLoading = useSubscribe("games");
-  const loading = isLoading();
-  const games = useFind(()=> GameCollection.find());
-  const game = games[0];
-  
-  const Loading = () => <div>Loading...</div>;
-  
-  // const [loading, game] = useSubscribe('games', () => {
-  //   return [...GameCollection.find()][0];
-  // });
+    
+  const [loading, game] = useSubscribe('games', () => {
+    return [...GameCollection.find()][0];
+  });
   
   return (
     <div>
