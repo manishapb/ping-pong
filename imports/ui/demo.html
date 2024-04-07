@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div id="board" style="position: relative">
+        <div id="leftPaddle" style='
+            background: black; 
+            position: absolute;
+            border-radius: 50%;
+        '>
+        </div>
+        <div id="rightPaddle" style='
+            background: black; 
+            position: absolute;
+            border-radius: 50%;
+        '>
+        </div>
+        <div id="ball" style='
+            background: black; 
+            position: absolute;
+            border-radius: 50%;
+        '>
+        </div>
+    </div>
+    <script>
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        const boardWidth = 0.8 * screenWidth;
+        const boardHeight = 0.5 * screenHeight;
+        const boardX = 0.1 * screenWidth;
+        const boardY = 0.25 * screenHeight;
+
+        const board = document.getElementById('board');
+        board.style.width = boardWidth + "px";
+        board.style.height = boardHeight + "px";
+        board.style.left = boardX + 'px';
+        board.style.top = boardY + 'px';
+        board.style.border = "1px solid black";
+
+        const paddleWidth = 0.01 * boardWidth;
+        const paddleHeight = 0.25 * boardHeight;
+        const paddleMaxY = boardHeight - paddleHeight;
+        const paddleMinY = 0;
+
+        let leftPaddleX = 0;
+        let leftPaddleY = 0;
+
+        const leftPaddle = document.getElementById('leftPaddle');
+        leftPaddle.style.width = paddleWidth + "px";
+        leftPaddle.style.height = paddleHeight + "px";
+        leftPaddle.style.left = leftPaddleX + 'px';
+        leftPaddle.style.top = leftPaddleY + 'px';
+
+        let rightPaddleX = boardWidth - paddleWidth;
+        let rightPaddleY = 0;
+
+        const rightPaddle = document.getElementById('rightPaddle');
+        rightPaddle.style.width = paddleWidth + "px";
+        rightPaddle.style.height = paddleHeight + "px";
+        rightPaddle.style.left = rightPaddleX + 'px';
+        rightPaddle.style.top = rightPaddleY + 'px';
+
+        const ballWidth = 0.02 * boardWidth;
+        const ballHeight = ballWidth;
+        const ballMinX = 0;
+        const ballMaxX = boardWidth - ballWidth;
+        const ballMinY = 0;
+        const ballMaxY = boardHeight - ballHeight;
+
+        let ballX = boardWidth / 2 - ballWidth / 2;
+        let ballY = boardHeight / 2 - ballHeight / 2;
+        let ballVelX = boardWidth * 0.005 * (Math.random() > 0.5 ? 1 : -1);
+        let ballVelY = boardHeight * 0.008 * (Math.random() > 0.5 ? 1 : -1);
+
+        const ball = document.getElementById('ball');
+        ball.style.width = ballWidth + "px";
+        ball.style.height = ballHeight + "px";
+        ball.style.left = ballX + 'px';
+        ball.style.top = ballY + 'px';
+
+        const keysPressed = {};
+        function onKeyDown(e) {
+            keysPressed[e.key] = true;
+        }
+        function onKeyUp(e) {
+            delete keysPressed[e.key];
+        }
+
+        function isColliding(x1, y1, w1, h1, x2, y2, w2, h2) {
+            function boxContainsPoint(boxX, boxY, boxW, boxH, pointX, pointY) {
+                return boxX <= pointX && pointX <= boxX + boxW
+                    && boxY <= pointY && pointY <= boxY + boxH;
+            }
+
+            function getBoxPoints(x, y, w, h) {
+                return [
+                    [x, y],
+                    [x + w, y],
+                    [x + w, y + h],
+                    [x, y + h]
+                ];
+            }
+
+            function box2ContainsBox1Points(x1, y1, w1, h1, x2, y2, w2, h2) {
+                return getBoxPoints(x1, y1, w1, h1)
+                    .map(([x, y]) => boxContainsPoint(x2, y2, w2, h2, x, y))
+                    .reduce((acc, x) => acc || x, false);
+            }
+
+            return box2ContainsBox1Points(x1, y1, w1, h1, x2, y2, w2, h2)
+                || box2ContainsBox1Points(x2, y2, w2, h2, x1, y1, w1, h1);
+        }
+
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('keyup', onKeyUp);
+
+        setInterval(() => {
+            if (keysPressed['s']) {
+                if (leftPaddleY < paddleMaxY) {
+                    leftPaddleY = leftPaddleY + boardWidth * 0.01;
+                    if (leftPaddleY > paddleMaxY)
+                        leftPaddleY = paddleMaxY;
+                    leftPaddle.style.top = leftPaddleY + 'px';
+                }
+            } else if (keysPressed['w']) {
+                if (leftPaddleY > paddleMinY) {
+                    leftPaddleY = leftPaddleY - boardWidth * 0.01;
+                    if (leftPaddleY < paddleMinY)
+                        leftPaddleY = paddleMinY;
+                    leftPaddle.style.top = leftPaddleY + 'px';
+                }
+            }
+
+            if (keysPressed['ArrowDown']) {
+                if (rightPaddleY < paddleMaxY) {
+                    rightPaddleY = rightPaddleY + boardWidth * 0.01;
+                    if (rightPaddleY > paddleMaxY)
+                        rightPaddleY = paddleMaxY;
+                    rightPaddle.style.top = rightPaddleY + 'px';
+                }
+            } else if (keysPressed['ArrowUp']) {
+                if (rightPaddleY > paddleMinY) {
+                    rightPaddleY = rightPaddleY - boardWidth * 0.01;
+                    if (rightPaddleY < paddleMinY)
+                        rightPaddleY = paddleMinY;
+                    rightPaddle.style.top = rightPaddleY + 'px';
+                }
+            }
+
+            ballX += ballVelX;
+            ballY += ballVelY;
+
+            if (ballY < ballMinY) {
+                ballVelY = -ballVelY;
+                ballY = ballMinY;
+            } else if (ballY > ballMaxY) {
+                ballVelY = -ballVelY;
+                ballY = ballMaxY;
+            }
+
+            if (isColliding(
+                    leftPaddleX, leftPaddleY, paddleWidth, paddleHeight,
+                    ballX, ballY, ballWidth, ballHeight
+                )) {
+                ballVelX = -ballVelX;
+                ballX = leftPaddleX + paddleWidth + 1;
+            } else if(isColliding(
+                    rightPaddleX, rightPaddleY, paddleWidth, paddleHeight,
+                    ballX, ballY, ballWidth, ballHeight
+                )) {
+                ballVelX = -ballVelX;
+                ballX = rightPaddleX - ballWidth - 1;
+            }
+
+            if (ballX < ballMinX || ballX > ballMaxX) {
+                ballX = boardWidth / 2 - ballWidth / 2;
+                ballY = boardHeight / 2 - ballHeight / 2;
+            }
+
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
+        }, 17);
+    </script>
+</body>
+
+</html>
