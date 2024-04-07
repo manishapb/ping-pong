@@ -3,11 +3,18 @@ body {
   font-family: sans-serif;
 }
 .game-board {
+  position: relative;
   width: 500px;
   height: 200px;
-  
 }
 .paddle {
   width: 5px;
   height: 50px;
+}
+.border-left {
+  top: 10px;
+  right: 250px;
+  position: absolute;
+  height: 190px;
+  border-left: 2px dotted #444;
 }
