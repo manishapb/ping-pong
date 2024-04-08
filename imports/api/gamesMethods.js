@@ -77,16 +77,29 @@ Meteor.methods({
             let ballVelY = ball.velY;
 
             let update = {};
+            // move paddles
             if (game.board.lPad.velY !== 0)
                 lPadY = game.board.lPad.y + game.board.lPad.velY;
             if (game.board.rPad.velY !== 0)
                 rPadY = game.board.rPad.y + game.board.rPad.velY;
+
+            // contain paddles in board
+            if (lPadY < 0)
+                lPadY = 0;
+            if (lPadY > 0.75)
+                lPadY = 0.75;
+            if (rPadY < 0)
+                rPadY = 0;
+            if (rPadY > 0.75)
+                rPadY = 0.75;
             
+            // move ball
             if (game.board.ball.velX !== 0)
                 ballX = game.board.ball.x + game.board.ball.velX;
             if (game.board.ball.velY !== 0)
                 ballY = game.board.ball.y + game.board.ball.velY;
 
+            // bounce ball from board
             let ballHeight = 0.02 / 0.32;
             let maxBallY = 1 - ballHeight;
             if (ballY < 0) {
@@ -97,6 +110,7 @@ Meteor.methods({
                 ballVelY = -ballVelY;
             }
 
+            // reset ball
             if (ballX < 0 || ballX > 0.98) {
                 ballX = 0.49;
                 ballY = 0.49;
@@ -104,6 +118,7 @@ Meteor.methods({
                 ballVelY = 1.5 * randomBallVel();
             }
 
+            // bounce ball from paddles
             if (isColliding(
                     ballX, ballY, 0.02, ballHeight,
                     0, lPadY, 0.01, 0.25
