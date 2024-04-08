@@ -4,8 +4,8 @@ import { GameCollection } from '/imports/db/Collections';
 
 const activeGameLoops = {};
 
-const getRandomVel = () => {
-    return 0.08 * (Math.random() > 0.5 ? 1 : -1);
+const randomBallVel = () => {
+    return 0.02 * (Math.random() > 0.5 ? 1 : -1);
 }
 
 Meteor.methods({
@@ -30,8 +30,8 @@ Meteor.methods({
                 ball: {
                     x: 0.49,
                     y: 0.49,
-                    velX: getRandomVel(),
-                    velY: getRandomVel()
+                    velX: randomBallVel(),
+                    velY: 1.5 * randomBallVel()
                 }
             }
         });
@@ -43,16 +43,34 @@ Meteor.methods({
 
         let i = Meteor.setInterval(() => {
             let game = GameCollection.findOne({ _id: gameId });
+            let ball = game.board.ball;
+            let ballX = ball.x;
+            let ballY = ball.y;
+            let ballVelX = ball.velX;
+            let ballVelY = ball.velY;
 
             let update = {};
             if (game.board.lPad.velY !== 0)
                 update['board.lPad.y'] = game.board.lPad.y + game.board.lPad.velY;
             if (game.board.rPad.velY !== 0)
                 update['board.rPad.y'] = game.board.rPad.y + game.board.rPad.velY;
-            if (game.board.ball.velX !== 0) 
-                update['board.ball.x'] = game.board.ball.x + game.board.ball.velX;
-            if (game.board.ball.velY !== 0) 
-                update['board.ball.y'] = game.board.ball.y + game.board.ball.velY;
+            
+            if (game.board.ball.velX !== 0)
+                ballX = game.board.ball.x + game.board.ball.velX;
+            if (game.board.ball.velY !== 0)
+                ballY = game.board.ball.y + game.board.ball.velY;
+
+            if (ballY < 0) {
+                ballVelY = -ballVelY;
+                ballY = 0;
+            } else if (ballY > 0.98) {
+                ballVelY = -ballVelY;
+                ballY = ballMaxY;
+            }
+
+            update['board.ball.x'] = ballX;
+            update['board.ball.y'] = ballY;
+            update['board.ball.velY'] = ballVelY;
 
             GameCollection.update(
                 { _id: gameId },
