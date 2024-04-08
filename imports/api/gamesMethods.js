@@ -62,9 +62,19 @@ Meteor.methods({
         });
     },
     'games.join'(gameId) {
+        let player2 = Meteor.userId();
         let game = GameCollection.findOne({ _id: gameId });
         if (!game)
             return;
+
+        Meteor.setTimeout(() => {
+            GameCollection.remove({_id: gameId});
+            Meteor.logout();
+            Meteor.users.remove({$or: [
+                {_id: game.player1},
+                {_id: player2},
+            ]});
+        }, 5 * 60 * 1000);
 
         let i = Meteor.setInterval(() => {
             let game = GameCollection.findOne({ _id: gameId });
@@ -151,7 +161,7 @@ Meteor.methods({
             { _id: gameId },
             {
                 $set: {
-                    player2: Meteor.userId(),
+                    player2,
                     state: "ongoing"
                 }
             }
