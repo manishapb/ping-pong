@@ -92,7 +92,7 @@ Meteor.methods({
                 rPadY = 0;
             if (rPadY > 0.75)
                 rPadY = 0.75;
-            
+
             // move ball
             if (game.board.ball.velX !== 0)
                 ballX = game.board.ball.x + game.board.ball.velX;
@@ -120,15 +120,15 @@ Meteor.methods({
 
             // bounce ball from paddles
             if (isColliding(
-                    ballX, ballY, 0.02, ballHeight,
-                    0, lPadY, 0.01, 0.25
-                )) {
+                ballX, ballY, 0.02, ballHeight,
+                0, lPadY, 0.01, 0.25
+            )) {
                 ballVelX = -ballVelX;
                 ballX = 0.015;
             } else if (isColliding(
-                    ballX, ballY, 0.02, ballHeight,
-                    0.99, rPadY, 0.01, 0.25
-                )) {
+                ballX, ballY, 0.02, ballHeight,
+                0.99, rPadY, 0.01, 0.25
+            )) {
                 ballVelX = -ballVelX;
                 ballX = 0.99 - 0.025;
             }
@@ -154,8 +154,8 @@ Meteor.methods({
                     player2: Meteor.userId(),
                     state: "ongoing"
                 }
-            });
-
+            }
+        );
     },
     'games.move'(dir, gameId, userId, player) {
         check(player, Number);
