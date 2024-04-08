@@ -44,13 +44,13 @@ Meteor.methods({
             board: {
                 lPad: {
                     x: 0,
-                    y: 0,
+                    y: (1 - 0.25)/2,
                     velY: 0,
                     score: 0
                 },
                 rPad: {
                     x: 0.987,
-                    y: 0,
+                    y: (1 - 0.25)/2,
                     velY: 0,
                     score: 0
                 },
