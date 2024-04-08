@@ -1,12 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GameCollection } from '/imports/db/Collections';
-import { lPadX, rPadX } from '/imports/constants';
-import { ballWidth, initBallX, initBallY,
+import { lPadX, ballWidth, initBallX, initBallY,
     maxBallX, maxPadY, minBallX,
     minPadY, paddleHeight, paddleVel, 
     paddleWidth, gameAliveTimeout, 
-    maxScore, gameInterval } from '../constants';
+    maxScore, gameInterval, boardWidth } from '../constants';
 
 const activeGameLoops = {};
 
@@ -50,13 +49,13 @@ Meteor.methods({
             board: {
                 lPad: {
                     x: lPadX,
-                    y: (1 - 0.25)/2,
+                    y: (1 - paddleHeight)/2,
                     velY: 0,
                     score: 0
                 },
                 rPad: {
-                    x: rPadX,
-                    y: (1 - 0.25)/2,
+                    x: boardWidth - 1.15 * paddleWidth,
+                    y: (1 - paddleHeight)/2,
                     velY: 0,
                     score: 0
                 },
@@ -151,18 +150,19 @@ Meteor.methods({
             }
 
             // bounce ball from paddles
+            let rPadX = boardWidth - paddleWidth;
             if (isColliding(
                 ballX, ballY, ballWidth, ballHeight,
                 lPadX, lPadY, paddleWidth, paddleHeight
             )) {
                 ballVelX = -ballVelX;
-                ballX = 0.015;
+                ballX = 1.5 * paddleWidth;
             } else if (isColliding(
                 ballX, ballY, ballWidth, ballHeight,
                 rPadX, rPadY, paddleWidth, paddleHeight
             )) {
                 ballVelX = -ballVelX;
-                ballX = 0.99 - 0.025;
+                ballX = boardWidth - 1.5 * paddleWidth - ballWidth;
             }
 
             updates['board.lPad.y'] = lPadY;
