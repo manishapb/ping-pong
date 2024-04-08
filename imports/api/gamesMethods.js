@@ -60,11 +60,13 @@ Meteor.methods({
             if (game.board.ball.velY !== 0)
                 ballY = game.board.ball.y + game.board.ball.velY;
 
+            let ballHeight = 0.02 / 0.32;
+            let maxBallY = 1 - ballHeight;
             if (ballY < 0) {
                 ballY = 0;
                 ballVelY = -ballVelY;
-            } else if (ballY > 0.98) {
-                ballY = 0.98;
+            } else if (ballY > maxBallY) {
+                ballY = maxBallY;
                 ballVelY = -ballVelY;
             }
 
