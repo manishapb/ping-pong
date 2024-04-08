@@ -1,4 +1,3 @@
 ## Changes
 
-1. Save entire game state backend
-2. Refactor Ball component: remove paddle from ball
+1. stop each game after 5mins into starting
