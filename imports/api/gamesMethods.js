@@ -76,7 +76,7 @@ Meteor.methods({
             let ballVelX = ball.velX;
             let ballVelY = ball.velY;
 
-            let update = {};
+            let updates = {};
             // move paddles
             if (game.board.lPad.velY !== 0)
                 lPadY = game.board.lPad.y + game.board.lPad.velY;
@@ -133,16 +133,16 @@ Meteor.methods({
                 ballX = 0.99 - 0.025;
             }
 
-            update['board.lPad.y'] = lPadY;
-            update['board.rPad.y'] = rPadY;
-            update['board.ball.x'] = ballX;
-            update['board.ball.y'] = ballY;
-            update['board.ball.velX'] = ballVelX;
-            update['board.ball.velY'] = ballVelY;
+            updates['board.lPad.y'] = lPadY;
+            updates['board.rPad.y'] = rPadY;
+            updates['board.ball.x'] = ballX;
+            updates['board.ball.y'] = ballY;
+            updates['board.ball.velX'] = ballVelX;
+            updates['board.ball.velY'] = ballVelY;
 
             GameCollection.update(
                 { _id: gameId },
-                { $set: update }
+                { $set: updates }
             );
         }, 67);
         activeGameLoops[gameId] = i;

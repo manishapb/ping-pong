@@ -94,19 +94,19 @@ const Board = ({ lPad, rPad, ball }) => (
 
 export const Game = ({ user, game }) => {
     const player = game.player1 === user._id ? 1 : 2;
-    const pad = player === 1 ? 'lPad' : 'rPad'; 
-    
+    const pad = player === 1 ? 'lPad' : 'rPad';
+
     useEffect(() => {
         let f = () => {
-            if(keysPressed['ArrowDown']
-            && game.board[pad].velY <= 0) {
+            if (keysPressed['ArrowDown']
+                && game.board[pad].velY <= 0) {
                 Meteor.call('games.move', 'down', game._id, user._id, player);
-            } else if(keysPressed['ArrowUp']
-                   && game.board[pad].velY >= 0) {
+            } else if (keysPressed['ArrowUp']
+                && game.board[pad].velY >= 0) {
                 Meteor.call('games.move', 'up', game._id, user._id, player);
-            } else if(!keysPressed['ArrowDown'] 
-                   && !keysPressed['ArrowUp'] 
-                   && game.board[pad].velY !== 0) {
+            } else if (!keysPressed['ArrowDown']
+                && !keysPressed['ArrowUp']
+                && game.board[pad].velY !== 0) {
                 Meteor.call('games.move', 'stop', game._id, user._id, player);
             }
         };
@@ -117,7 +117,7 @@ export const Game = ({ user, game }) => {
 
     return (
         <>
-            <div 
+            <div
                 style={{
                     position: 'absolute',
                     left: boardX,
