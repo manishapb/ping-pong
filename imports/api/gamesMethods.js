@@ -175,6 +175,7 @@ Meteor.methods({
             if (rPadScore === 5 || lPadScore === 5) {
                 updates['state'] = "ended";
                 updates['winner'] = lPadScore === 5 ? game.player1 : player2;
+                clearInterval(activeGameLoops[gameId]);
             }
 
             GameCollection.update(
