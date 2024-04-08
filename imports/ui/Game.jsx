@@ -97,16 +97,21 @@ export const Game = ({ user, game }) => {
     const pad = player === 1 ? 'lPad' : 'rPad'; 
     
     useEffect(() => {
-        let i = setInterval(() => {
-            if(keysPressed['ArrowDown'] && game.board[pad].velY >= 0)
+        let f = () => {
+            if(keysPressed['ArrowDown']
+            && game.board[pad].velY <= 0) {
                 Meteor.call('games.move', 'down', game._id, user._id, player);
-            else if(keysPressed['ArrowUp'] && game.board[pad].velY <= 0)
+            } else if(keysPressed['ArrowUp']
+                   && game.board[pad].velY >= 0) {
                 Meteor.call('games.move', 'up', game._id, user._id, player);
-            else if(!keysPressed['ArrowDown'] 
-                 && !keysPressed['ArrowUp'] 
-                 && game.board[pad].velY !== 0)
+            } else if(!keysPressed['ArrowDown'] 
+                   && !keysPressed['ArrowUp'] 
+                   && game.board[pad].velY !== 0) {
                 Meteor.call('games.move', 'stop', game._id, user._id, player);
-        }, 200);
+            }
+        };
+        let i = setInterval(f, 200);
+        f();
         return () => clearInterval(i);
     });
 
