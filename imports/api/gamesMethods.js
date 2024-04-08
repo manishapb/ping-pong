@@ -213,6 +213,12 @@ Meteor.methods({
 
     },
     'games.end'(gameId) {
+        let userId = Meteor.userId();
+
+        let game = GameCollection.findOne({ _id: gameId });
+        if(![game.player1, game.player2].includes(userId))
+            throw new Meteor.Error(401, 'Only players can end a game.');
+        
         let gameLoop = activeGameLoops[gameId] || -1;
         Meteor.clearInterval(gameLoop);
 
@@ -225,5 +231,7 @@ Meteor.methods({
                 }
             }
         );
+
+        Meteor.users.remove({_id: userId});
     }
 })

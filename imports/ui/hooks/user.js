@@ -4,21 +4,32 @@ import { Meteor } from 'meteor/meteor';
 const genstr = () =>
     (Math.random() + 1).toString(36).substring(7);
 
+const newUser = (setUser) => {
+    let username = genstr();
+    Meteor.call('user.new', username, err => {
+        if (err)
+            newUser(setUser);
+        else {
+            Meteor.loginWithPassword(username, username, () => {
+                setUser(Meteor.user());
+            });
+        }
+    })
+}
+
 export const useUser = () => {
-    const [username, setUsername] = useState(genstr());
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        Meteor.call('user.new', username, err => {
-            if (err)
-                setUsername(genstr());
-            else {
-                Meteor.loginWithPassword(username, username, () => {
-                    setUser(Meteor.user());
-                });
-            }
-        })
-    }, [username]);
+        if(!user)
+            newUser(setUser)
+    }, [user]);
 
-    return user;
+    const logout = () => {
+        if(user)
+            Meteor.logout();
+        setUser(null);
+    }
+
+    return [user, logout];
 }

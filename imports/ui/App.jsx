@@ -8,7 +8,7 @@ import { useSubscribe } from '/imports/ui/hooks/subscribe';
 import { Loading } from '/imports/ui/Loading';
 
 export const App = () => {
-  const user = useUser();
+  const [user, logout] = useUser();
   const [loading, game] = useSubscribe('games', () => {
     return [...GameCollection.find()][0];
   });
@@ -17,7 +17,7 @@ export const App = () => {
     <Loading
       loading={loading}
       element={(user && game && game.active ?
-        <Game user={user} game={game} />
+        <Game user={user} logout={logout} game={game} />
         : <Home />)}
     />
   );

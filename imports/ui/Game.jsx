@@ -23,8 +23,9 @@ addEventListener('keyup', e => {
     delete keysPressed[e.key];
 });
 
-const endGame = (game) => {
-    Meteor.call('games.end', game._id, err => {
+const endGame = (gameId, logout) => {
+    Meteor.call('games.end', gameId, err => {
+        logout();
         if (err)
             alert(err);
     });
@@ -92,7 +93,7 @@ const Board = ({ lPad, rPad, ball }) => (
     </div>
 )
 
-export const Game = ({ user, game }) => {
+export const Game = ({ user, logout, game }) => {
     const player = game.player1 === user._id ? 1 : 2;
     const pad = player === 1 ? 'lPad' : 'rPad';
 
@@ -139,12 +140,20 @@ export const Game = ({ user, game }) => {
                 <p>
                     <b>Player2: </b> {game.board.rPad.score}
                 </p>
-                {game.winner?
-                    (game.winner === user._id ? 
+                {game.winner ?
+                    (game.winner === user._id ?
                         <b>You Win!</b>
                         : <b>You Lose! </b>)
                     : <></>
                 }
+                <p>
+                    <button
+                        className='button'
+                        onClick={() => endGame(game._id, logout)}
+                    >
+                        End Game
+                    </button>
+                </p>
             </div>
             <Board
                 lPad={game.board.lPad}
