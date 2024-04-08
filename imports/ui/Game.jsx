@@ -139,6 +139,12 @@ export const Game = ({ user, game }) => {
                 <p>
                     <b>Player2: </b> {game.board.rPad.score}
                 </p>
+                {game.winner?
+                    (game.winner === user._id ? 
+                        <b>You Win!</b>
+                        : <b>You Lose! </b>)
+                    : <></>
+                }
             </div>
             <Board
                 lPad={game.board.lPad}

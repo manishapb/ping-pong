@@ -70,12 +70,14 @@ Meteor.methods({
             return;
 
         Meteor.setTimeout(() => {
-            GameCollection.remove({_id: gameId});
+            GameCollection.remove({ _id: gameId });
             Meteor.logout();
-            Meteor.users.remove({$or: [
-                {_id: game.player1},
-                {_id: player2},
-            ]});
+            Meteor.users.remove({
+                $or: [
+                    { _id: game.player1 },
+                    { _id: player2 },
+                ]
+            });
         }, 5 * 60 * 1000);
 
         let i = Meteor.setInterval(() => {
@@ -92,6 +94,9 @@ Meteor.methods({
             let ballY = ball.y;
             let ballVelX = ball.velX;
             let ballVelY = ball.velY;
+
+            let state = game.state;
+            let active = game.active;
 
             let updates = {};
             // move paddles
@@ -165,6 +170,12 @@ Meteor.methods({
             updates['board.ball.velY'] = ballVelY;
             updates['board.lPad.score'] = lPadScore;
             updates['board.rPad.score'] = rPadScore;
+
+            // if ended
+            if (rPadScore === 5 || lPadScore === 5) {
+                updates['state'] = "ended";
+                updates['winner'] = lPadScore === 5 ? game.player1 : player2;
+            }
 
             GameCollection.update(
                 { _id: gameId },
