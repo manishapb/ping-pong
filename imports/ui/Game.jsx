@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
 import constants from '/imports/constants';
 
-console.log("constants : ",constants.screenHeightRatio);
 
 const screenWidth = globalThis.innerWidth;
 const screenHeight = constants.screenHeightRatio * screenWidth;
@@ -67,7 +66,7 @@ const Ball = ({ x, y }) => (
     </div>
 )
 
-const Board = ({ lPad, rPad, ball }) => (
+const Board = ({ lPad, rPad, ball, winner }) => (
     <div
         id='board'
         style={{
@@ -95,7 +94,7 @@ const Board = ({ lPad, rPad, ball }) => (
                 position: 'absolute',
                 left: 0.2 * boardWidth,
                 top: 0.05 * boardHeight,
-                fontSize: 0.5 * boardHeight
+                fontSize: 0.5 * boardHeight,
             }}
         >
             {lPad.score}
@@ -105,11 +104,24 @@ const Board = ({ lPad, rPad, ball }) => (
                 position: 'absolute',
                 left: 0.7 * boardWidth,
                 top: 0.05 * boardHeight,
-                fontSize: 0.5 * boardHeight
+                fontSize: 0.5 * boardHeight,
             }}
         >
             {rPad.score}
         </div>
+        {winner ?
+            <div 
+                className='is-family-code'
+                style={{
+                    position: 'absolute',
+                    left: 0.35 * boardWidth,
+                    top: 0.70 * boardHeight,
+                    fontSize: 0.2 * boardHeight,
+                }}
+            >
+                {winner === Meteor.userId()? "You win!": "You lose!"}
+            </div>
+            : <></>}
 
         <Paddle
             id="leftPaddle"
@@ -154,7 +166,7 @@ export const Game = ({ user, logout, game }) => {
 
     return (
         <>
-            <div
+            <div className='is-family-code'
                 style={{
                     position: 'absolute',
                     left: boardX,
@@ -170,12 +182,6 @@ export const Game = ({ user, logout, game }) => {
                 <p>
                     <b>You are: </b> Player {player}
                 </p>
-                {game.winner ?
-                    (game.winner === user._id ?
-                        <b>You Win!</b>
-                        : <b>You Lose! </b>)
-                    : <></>
-                }
                 <p>
                     <button
                         className='button'
@@ -189,6 +195,7 @@ export const Game = ({ user, logout, game }) => {
                 lPad={game.board.lPad}
                 rPad={game.board.rPad}
                 ball={game.board.ball}
+                winner={game.winner}
             />
         </>
     );
