@@ -1,11 +1,20 @@
-import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
+import { Meteor } from 'meteor/meteor';
+import {
+    ballHeight,
+    ballWidth,
+    boardWidth,
+    gameAliveTimeout,
+    gameInterval,
+    initBallX, initBallY,
+    lPadX,
+    maxBallX, maxPadY,
+    maxScore,
+    minBallX,
+    minPadY, paddleHeight, paddleVel,
+    paddleWidth
+} from '../constants';
 import { GameCollection } from '/imports/db/Collections';
-import { lPadX, ballWidth, initBallX, initBallY,
-    maxBallX, maxPadY, minBallX,
-    minPadY, paddleHeight, paddleVel, 
-    paddleWidth, gameAliveTimeout, 
-    maxScore, gameInterval, boardWidth } from '../constants';
 
 const activeGameLoops = {};
 
@@ -49,13 +58,13 @@ Meteor.methods({
             board: {
                 lPad: {
                     x: lPadX,
-                    y: (1 - paddleHeight)/2,
+                    y: (1 - paddleHeight) / 2,
                     velY: 0,
                     score: 0
                 },
                 rPad: {
                     x: boardWidth - 1.15 * paddleWidth,
-                    y: (1 - paddleHeight)/2,
+                    y: (1 - paddleHeight) / 2,
                     velY: 0,
                     score: 0
                 },
@@ -124,7 +133,6 @@ Meteor.methods({
                 ballY = game.board.ball.y + game.board.ball.velY;
 
             // bounce ball from board
-            let ballHeight = ballWidth / 0.32;
             let maxBallY = 1 - ballHeight;
             if (ballY < 0) {
                 ballY = 0;
@@ -219,9 +227,9 @@ Meteor.methods({
         let userId = Meteor.userId();
 
         let game = GameCollection.findOne({ _id: gameId });
-        if(![game.player1, game.player2].includes(userId))
+        if (![game.player1, game.player2].includes(userId))
             throw new Meteor.Error(401, 'Only players can end a game.');
-        
+
         let gameLoop = activeGameLoops[gameId] || -1;
         Meteor.clearInterval(gameLoop);
 
@@ -235,6 +243,6 @@ Meteor.methods({
             }
         );
 
-        Meteor.users.remove({_id: userId});
+        Meteor.users.remove({ _id: userId });
     }
 })

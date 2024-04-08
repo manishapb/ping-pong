@@ -24,10 +24,11 @@ export const paddleHeight = 0.25;
 export const paddleVel = 0.08;
 export const lPadX = 0;
 export const minPadY = 0;
-export const maxPadY = 0.75;
+export const maxPadY = boardHeight - paddleHeight;
 
-export const initBallX = 0.49;
-export const initBallY = 0.49;
+export const ballWidth = 0.02;
+export const ballHeight = ballWidth / 0.32;
+export const initBallX = (boardWidth - ballWidth)/2;
+export const initBallY = (boardHeight - ballHeight)/2;
 export const minBallX = 0;
 export const maxBallX = 0.98;
-export const ballWidth = 0.02;
