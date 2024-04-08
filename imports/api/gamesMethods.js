@@ -61,15 +61,23 @@ Meteor.methods({
                 ballY = game.board.ball.y + game.board.ball.velY;
 
             if (ballY < 0) {
-                ballVelY = -ballVelY;
                 ballY = 0;
-            } else if (ballY > 0.98) {
                 ballVelY = -ballVelY;
-                ballY = ballMaxY;
+            } else if (ballY > 0.98) {
+                ballY = 0.98;
+                ballVelY = -ballVelY;
+            }
+
+            if (ballX < 0 || ballX > 0.98) {
+                ballX = 0.49;
+                ballY = 0.49;
+                ballVelX = randomBallVel();
+                ballVelY = 1.5 * randomBallVel();
             }
 
             update['board.ball.x'] = ballX;
             update['board.ball.y'] = ballY;
+            update['board.ball.velX'] = ballVelX;
             update['board.ball.velY'] = ballVelY;
 
             GameCollection.update(
