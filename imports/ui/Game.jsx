@@ -133,6 +133,12 @@ export const Game = ({ user, game }) => {
                 <p>
                     <b>You are: </b> Player {player}
                 </p>
+                <p>
+                    <b>Player1: </b> {game.board.lPad.score}
+                </p>
+                <p>
+                    <b>Player2: </b> {game.board.rPad.score}
+                </p>
             </div>
             <Board
                 lPad={game.board.lPad}

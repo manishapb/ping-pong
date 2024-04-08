@@ -45,12 +45,14 @@ Meteor.methods({
                 lPad: {
                     x: 0,
                     y: 0,
-                    velY: 0
+                    velY: 0,
+                    score: 0
                 },
                 rPad: {
                     x: 0.987,
                     y: 0,
-                    velY: 0
+                    velY: 0,
+                    score: 0
                 },
                 ball: {
                     x: 0.49,
@@ -78,8 +80,13 @@ Meteor.methods({
 
         let i = Meteor.setInterval(() => {
             let game = GameCollection.findOne({ _id: gameId });
+
             let lPadY = game.board.lPad.y;
+            let lPadScore = game.board.lPad.score;
+
             let rPadY = game.board.rPad.y;
+            let rPadScore = game.board.rPad.score;
+
             let ball = game.board.ball;
             let ballX = ball.x;
             let ballY = ball.y;
@@ -121,11 +128,18 @@ Meteor.methods({
             }
 
             // reset ball
-            if (ballX < 0 || ballX > 0.98) {
+            let resetBall = () => {
                 ballX = 0.49;
                 ballY = 0.49;
                 ballVelX = randomBallVel();
                 ballVelY = 1.5 * randomBallVel();
+            }
+            if (ballX < 0) {
+                rPadScore += 1;
+                resetBall();
+            } else if (ballX > 0.98) {
+                lPadScore += 1;
+                resetBall();
             }
 
             // bounce ball from paddles
@@ -149,6 +163,8 @@ Meteor.methods({
             updates['board.ball.y'] = ballY;
             updates['board.ball.velX'] = ballVelX;
             updates['board.ball.velY'] = ballVelY;
+            updates['board.lPad.score'] = lPadScore;
+            updates['board.rPad.score'] = rPadScore;
 
             GameCollection.update(
                 { _id: gameId },
