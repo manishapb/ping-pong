@@ -76,6 +76,38 @@ const Board = ({ lPad, rPad, ball }) => (
             height: boardHeight
         }}
     >
+        <div
+            style={{
+                position: 'absolute',
+                left: 0.5 * boardWidth,
+                top: 0,
+                width: 1,
+                height: 1 * boardHeight,
+                border: '1px dashed white'
+            }}
+        >
+        </div>
+        <div
+            style={{
+                position: 'absolute',
+                left: 0.2 * boardWidth,
+                top: 0.05 * boardHeight,
+                fontSize: 0.5 * boardHeight
+            }}
+        >
+            {lPad.score}
+        </div>
+        <div
+            style={{
+                position: 'absolute',
+                left: 0.7 * boardWidth,
+                top: 0.05 * boardHeight,
+                fontSize: 0.5 * boardHeight
+            }}
+        >
+            {rPad.score}
+        </div>
+
         <Paddle
             id="leftPaddle"
             x={lPad.x * boardWidth}
@@ -86,6 +118,7 @@ const Board = ({ lPad, rPad, ball }) => (
             x={rPad.x * boardWidth}
             y={rPad.y * boardHeight}
         />
+
         <Ball
             x={ball.x * boardWidth}
             y={ball.y * boardHeight}
@@ -133,12 +166,6 @@ export const Game = ({ user, logout, game }) => {
                 </p>
                 <p>
                     <b>You are: </b> Player {player}
-                </p>
-                <p>
-                    <b>Player1: </b> {game.board.lPad.score}
-                </p>
-                <p>
-                    <b>Player2: </b> {game.board.rPad.score}
                 </p>
                 {game.winner ?
                     (game.winner === user._id ?
