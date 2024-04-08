@@ -1,6 +1,12 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { GameCollection } from '/imports/db/Collections';
+import { lPadX, rPadX } from '/imports/constants';
+import { ballWidth, initBallX, initBallY,
+    maxBallX, maxPadY, minBallX,
+    minPadY, paddleHeight, paddleVel, 
+    paddleWidth, gameAliveTimeout, 
+    maxScore, gameInterval } from '../constants';
 
 const activeGameLoops = {};
 
@@ -43,20 +49,20 @@ Meteor.methods({
             winner: null,
             board: {
                 lPad: {
-                    x: 0,
+                    x: lPadX,
                     y: (1 - 0.25)/2,
                     velY: 0,
                     score: 0
                 },
                 rPad: {
-                    x: 0.987,
+                    x: rPadX,
                     y: (1 - 0.25)/2,
                     velY: 0,
                     score: 0
                 },
                 ball: {
-                    x: 0.49,
-                    y: 0.49,
+                    x: initBallX,
+                    y: initBallY,
                     velX: randomBallVel(),
                     velY: 1.5 * randomBallVel()
                 }
@@ -78,7 +84,7 @@ Meteor.methods({
                     { _id: player2 },
                 ]
             });
-        }, 5 * 60 * 1000);
+        }, gameAliveTimeout);
 
         let i = Meteor.setInterval(() => {
             let game = GameCollection.findOne({ _id: gameId });
@@ -95,9 +101,6 @@ Meteor.methods({
             let ballVelX = ball.velX;
             let ballVelY = ball.velY;
 
-            let state = game.state;
-            let active = game.active;
-
             let updates = {};
             // move paddles
             if (game.board.lPad.velY !== 0)
@@ -106,14 +109,14 @@ Meteor.methods({
                 rPadY = game.board.rPad.y + game.board.rPad.velY;
 
             // contain paddles in board
-            if (lPadY < 0)
-                lPadY = 0;
-            if (lPadY > 0.75)
-                lPadY = 0.75;
-            if (rPadY < 0)
-                rPadY = 0;
-            if (rPadY > 0.75)
-                rPadY = 0.75;
+            if (lPadY < minPadY)
+                lPadY = minPadY;
+            if (lPadY > maxPadY)
+                lPadY = maxPadY;
+            if (rPadY < minPadY)
+                rPadY = minPadY;
+            if (rPadY > maxPadY)
+                rPadY = maxPadY;
 
             // move ball
             if (game.board.ball.velX !== 0)
@@ -122,7 +125,7 @@ Meteor.methods({
                 ballY = game.board.ball.y + game.board.ball.velY;
 
             // bounce ball from board
-            let ballHeight = 0.02 / 0.32;
+            let ballHeight = ballWidth / 0.32;
             let maxBallY = 1 - ballHeight;
             if (ballY < 0) {
                 ballY = 0;
@@ -132,31 +135,31 @@ Meteor.methods({
                 ballVelY = -ballVelY;
             }
 
-            // reset ball
+            // reset ball 
             let resetBall = () => {
-                ballX = 0.49;
-                ballY = 0.49;
+                ballX = initBallX;
+                ballY = initBallY;
                 ballVelX = randomBallVel();
                 ballVelY = 1.5 * randomBallVel();
             }
-            if (ballX < 0) {
+            if (ballX < minBallX) {
                 rPadScore += 1;
                 resetBall();
-            } else if (ballX > 0.98) {
+            } else if (ballX > maxBallX) {
                 lPadScore += 1;
                 resetBall();
             }
 
             // bounce ball from paddles
             if (isColliding(
-                ballX, ballY, 0.02, ballHeight,
-                0, lPadY, 0.01, 0.25
+                ballX, ballY, ballWidth, ballHeight,
+                lPadX, lPadY, paddleWidth, paddleHeight
             )) {
                 ballVelX = -ballVelX;
                 ballX = 0.015;
             } else if (isColliding(
-                ballX, ballY, 0.02, ballHeight,
-                0.99, rPadY, 0.01, 0.25
+                ballX, ballY, ballWidth, ballHeight,
+                rPadX, rPadY, paddleWidth, paddleHeight
             )) {
                 ballVelX = -ballVelX;
                 ballX = 0.99 - 0.025;
@@ -172,9 +175,9 @@ Meteor.methods({
             updates['board.rPad.score'] = rPadScore;
 
             // if ended
-            if (rPadScore === 5 || lPadScore === 5) {
+            if (rPadScore === maxScore || lPadScore === maxScore) {
                 updates['state'] = "ended";
-                updates['winner'] = lPadScore === 5 ? game.player1 : player2;
+                updates['winner'] = lPadScore === maxScore ? game.player1 : player2;
                 clearInterval(activeGameLoops[gameId]);
             }
 
@@ -182,7 +185,7 @@ Meteor.methods({
                 { _id: gameId },
                 { $set: updates }
             );
-        }, 67);
+        }, gameInterval);
         activeGameLoops[gameId] = i;
 
         GameCollection.update(
@@ -202,7 +205,7 @@ Meteor.methods({
         if (!(game && game['player' + player] === userId))
             return;
         let pad = player === 1 ? 'lPad' : 'rPad';
-        let velY = dir === 'stop' ? 0 : (dir === 'up' ? -0.08 : 0.08);
+        let velY = dir === 'stop' ? 0 : (dir === 'up' ? -paddleVel : paddleVel);
         let update = {};
         update[`board.${pad}.velY`] = velY;
 

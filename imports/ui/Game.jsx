@@ -1,19 +1,22 @@
 import React, { useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
+import constants from '/imports/constants';
+
+console.log("constants : ",constants.screenHeightRatio);
 
 const screenWidth = globalThis.innerWidth;
-const screenHeight = 0.4 * screenWidth;
+const screenHeight = constants.screenHeightRatio * screenWidth;
 
-const boardWidth = 0.8 * screenWidth;
-const boardHeight = 0.7 * screenHeight;
-const boardX = 0.1 * screenWidth;
-const boardY = 0.1 * screenHeight;
+const boardWidth = constants.boardWidthRatio * screenWidth;
+const boardHeight = constants.boardHeightRatio * screenHeight;
+const boardX = constants.boardXYRatio * screenWidth;
+const boardY = constants.boardXYRatio * screenHeight;
 
-const paddleWidth = 0.01 * boardWidth;
-const paddleHeight = 0.25 * boardHeight;
-
-const ballWidth = 0.02 * boardWidth;
+const paddleWidth = constants.padWidthRatio * boardWidth;
+const paddleHeight = constants.padHeightRatio * boardHeight;
+const ballWidth = constants.ballXRatio * boardWidth;
 const ballHeight = ballWidth;
+
 
 const keysPressed = {};
 addEventListener('keydown', e => {
