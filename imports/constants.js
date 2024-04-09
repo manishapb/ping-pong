@@ -14,14 +14,15 @@ export const ballXRatio = 0.02;
 // backend constants
 export const maxScore = 5;
 export const gameAliveTimeout = 5 * 60 * 1000;
-export const gameInterval = 67;
+export const FPS = 60;
+export const gameInterval = 1000 / FPS;
 
 export const boardWidth = 1;
 export const boardHeight = 1;
 
 export const paddleWidth = 0.01;
 export const paddleHeight = 0.25;
-export const paddleVel = 0.08;
+export const paddleVel = 0.02;
 export const lPadX = 0;
 export const minPadY = 0;
 export const maxPadY = boardHeight - paddleHeight;

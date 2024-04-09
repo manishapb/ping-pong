@@ -19,7 +19,7 @@ import { GameCollection } from '/imports/db/Collections';
 const activeGameLoops = {};
 
 const randomBallVel = () => {
-    return 0.02 * (Math.random() > 0.5 ? 1 : -1);
+    return 0.05 * (Math.random() > 0.5 ? 1 : -1);
 }
 
 const isColliding = (x1, y1, w1, h1, x2, y2, w2, h2) => {
