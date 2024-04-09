@@ -4,22 +4,24 @@ import {
     ballHeight,
     ballWidth,
     boardWidth,
-    gameAliveTimeout,
     gameInterval,
+    gameAliveTimeout,
+    FPS,
     initBallX, initBallY,
     lPadX,
     maxBallX, maxPadY,
     maxScore,
     minBallX,
     minPadY, paddleHeight, paddleVel,
-    paddleWidth
+    paddleWidth,
+    ballVel
 } from '../constants';
 import { GameCollection } from '/imports/db/Collections';
 
 const activeGameLoops = {};
 
 const randomBallVel = () => {
-    return 0.05 * (Math.random() > 0.5 ? 1 : -1);
+    return ballVel * (Math.random() > 0.5 ? 1 : -1);
 }
 
 const isColliding = (x1, y1, w1, h1, x2, y2, w2, h2) => {
