@@ -39,7 +39,6 @@ const Paddle = ({ id, x, y }) => (
         style={{
             background: 'white',
             position: 'absolute',
-            borderRadius: "5%",
             left: x,
             top: y,
             width: paddleWidth,
