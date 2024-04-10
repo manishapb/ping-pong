@@ -65,6 +65,36 @@ const Ball = ({ x, y }) => (
     </div>
 )
 
+const ScoreBoard = ({ gameId, gameState, player, logout }) => {
+    return (
+        <div className='is-family-code'
+            style={{
+                position: 'absolute',
+                left: boardX,
+                top: boardY + boardHeight + 5
+            }}
+        >
+            <p>
+                <b>Game ID: </b> {gameId}
+            </p>
+            <p>
+                <b>Game state: </b> {gameState}
+            </p>
+            <p>
+                <b>You are: </b> Player {player}
+            </p>
+            <div>
+                <button
+                    className='button'
+                    onClick={() => endGame(gameId, logout)}
+                >
+                    End Game
+                </button>
+            </div>
+        </div>
+    );
+}
+
 const Board = ({ lPad, rPad, ball, winner }) => (
     <div
         id='board'
@@ -109,7 +139,7 @@ const Board = ({ lPad, rPad, ball, winner }) => (
             {rPad.score}
         </div>
         {winner ?
-            <div 
+            <div
                 className='is-family-code'
                 style={{
                     position: 'absolute',
@@ -118,7 +148,7 @@ const Board = ({ lPad, rPad, ball, winner }) => (
                     fontSize: 0.2 * boardHeight,
                 }}
             >
-                {winner === Meteor.userId()? "You win!": "You lose!"}
+                {winner === Meteor.userId() ? "You win!" : "You lose!"}
             </div>
             : <></>}
 
@@ -165,37 +195,17 @@ export const Game = ({ user, logout, game }) => {
 
     return (
         <>
-            <div className='is-family-code'
-                style={{
-                    position: 'absolute',
-                    left: boardX,
-                    top: boardY + boardHeight + 5
-                }}
-            >
-                <p>
-                    <b>Game ID: </b> {game._id}
-                </p>
-                <p>
-                    <b>Game state: </b> {game.state}
-                </p>
-                <p>
-                    <b>You are: </b> Player {player}
-                </p>
-                <p>
-                    <button
-                        className='button'
-                        onClick={() => endGame(game._id, logout)}
-                    >
-                        End Game
-                    </button>
-                </p>
-            </div>
             <Board
                 lPad={game.board.lPad}
                 rPad={game.board.rPad}
                 ball={game.board.ball}
                 winner={game.winner}
             />
+            <ScoreBoard 
+                gameId={game._id}
+                gameState={game.state}
+                player={player}
+                logout={logout} />
         </>
     );
 }

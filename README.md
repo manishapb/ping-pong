@@ -1,6 +1,6 @@
 # ping-pong
 
-Multipler Pong!
+Multiplayer Pong!
 
 Made using Meteor and React.
 
