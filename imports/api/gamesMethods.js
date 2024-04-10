@@ -85,6 +85,10 @@ Meteor.methods({
         if (!game)
             return;
 
+        if (game.player1 && game.player2
+            && (game.player1 !== player2 || game.player2 !== player2))
+            return;
+
         Meteor.setTimeout(() => {
             GameCollection.remove({ _id: gameId });
             Meteor.logout();
@@ -212,6 +216,12 @@ Meteor.methods({
         check(player, Number);
 
         let game = GameCollection.findOne({ _id: gameId });
+
+        // Only players can modify game
+        if (![game.player1, game.player2].includes(Meteor.userId()))
+            return;
+
+        // Only player1 can move his paddle
         if (!(game && game['player' + player] === userId))
             return;
         let pad = player === 1 ? 'lPad' : 'rPad';
