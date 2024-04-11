@@ -19,6 +19,7 @@ import {
 import { GameCollection } from '/imports/db/Collections';
 
 const activeGameLoops = {};
+const countDownLoops = {};
 
 const randomBallVel = () => {
     return ballVel * (Math.random() > 0.5 ? 1 : -1);
@@ -57,6 +58,7 @@ Meteor.methods({
             state: 'waiting',
             active: true,
             winner: null,
+            countdown: 5,
             board: {
                 lPad: {
                     x: lPadX,
@@ -82,12 +84,43 @@ Meteor.methods({
     'games.join'(gameId) {
         let player2 = Meteor.userId();
         let game = GameCollection.findOne({ _id: gameId });
+
         if (!game)
             return;
 
         if (game.player1 && game.player2
             && (game.player1 !== player2 || game.player2 !== player2))
             return;
+
+        GameCollection.update(
+            { _id: gameId },
+            {
+                $set: {
+                    player2,
+                    state: "ongoing"
+                }
+            }
+        );
+
+        let countdown = game.countdown;
+
+        let i = Meteor.setInterval(()=> {
+            countdown = countdown - 1;
+            if (countdown <= 0) {
+                clearInterval(countDownLoops[gameId]);
+                Meteor.call('games.start', gameId);
+            }
+
+            GameCollection.update(
+                { _id: gameId},
+                { $set : { countdown: countdown}}
+            );
+        }, 1000);
+        countDownLoops[gameId] = i;
+    },
+    'games.start'(gameId) {
+        let player2 = Meteor.userId();
+        let game = GameCollection.findOne({ _id: gameId });
 
         Meteor.setTimeout(() => {
             GameCollection.remove({ _id: gameId });
@@ -202,15 +235,6 @@ Meteor.methods({
         }, gameInterval);
         activeGameLoops[gameId] = i;
 
-        GameCollection.update(
-            { _id: gameId },
-            {
-                $set: {
-                    player2,
-                    state: "ongoing"
-                }
-            }
-        );
     },
     'games.move'(dir, gameId, userId, player) {
         check(player, Number);

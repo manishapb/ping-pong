@@ -95,7 +95,7 @@ const ScoreBoard = ({ gameId, gameState, player, logout }) => {
     );
 }
 
-const Board = ({ lPad, rPad, ball, winner }) => (
+const Board = ({ lPad, rPad, ball, winner, countdown }) => (
     <div
         id='board'
         style={{
@@ -118,26 +118,42 @@ const Board = ({ lPad, rPad, ball, winner }) => (
             }}
         >
         </div>
-        <div
-            style={{
-                position: 'absolute',
-                left: 0.2 * boardWidth,
-                top: 0.05 * boardHeight,
-                fontSize: 0.5 * boardHeight,
-            }}
-        >
-            {lPad.score}
-        </div>
-        <div
-            style={{
-                position: 'absolute',
-                left: 0.7 * boardWidth,
-                top: 0.05 * boardHeight,
-                fontSize: 0.5 * boardHeight,
-            }}
-        >
-            {rPad.score}
-        </div>
+
+        {countdown > 0 ?
+            <div
+                style={{
+                    position: 'absolute',
+                    left: 0.46 * boardWidth,
+                    top: 0.20 * boardHeight,
+                    width: 1,
+                    height: 1 * boardHeight,
+                    fontSize: 0.4 * boardHeight
+                }}
+            > {countdown}
+            </div>
+            :
+            <div>
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: 0.2 * boardWidth,
+                        top: 0.05 * boardHeight,
+                        fontSize: 0.5 * boardHeight,
+                    }}
+                >
+                    {lPad.score}
+                </div>
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: 0.7 * boardWidth,
+                        top: 0.05 * boardHeight,
+                        fontSize: 0.5 * boardHeight,
+                    }}
+                >
+                    {rPad.score}
+                </div>
+            </div>}
         {winner ?
             <div
                 className='is-family-code'
@@ -200,8 +216,9 @@ export const Game = ({ user, logout, game }) => {
                 rPad={game.board.rPad}
                 ball={game.board.ball}
                 winner={game.winner}
+                countdown={game.countdown}
             />
-            <ScoreBoard 
+            <ScoreBoard
                 gameId={game._id}
                 gameState={game.state}
                 player={player}
