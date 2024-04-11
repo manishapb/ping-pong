@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Meteor } from 'meteor/meteor';
-import constants from '/imports/constants';
-
+import constants, { activeGameState } from '/imports/constants';
 
 const screenWidth = globalThis.innerWidth;
 const screenHeight = constants.screenHeightRatio * screenWidth;
@@ -95,7 +94,7 @@ const ScoreBoard = ({ gameId, gameState, player, logout }) => {
     );
 }
 
-const Board = ({ lPad, rPad, ball, winner, countdown }) => (
+const Board = ({ lPad, rPad, ball, winner, countdown, state }) => (
     <div
         id='board'
         style={{
@@ -119,7 +118,7 @@ const Board = ({ lPad, rPad, ball, winner, countdown }) => (
         >
         </div>
 
-        {countdown > 0 ?
+        {countdown > 0 && state === activeGameState ?
             <div
                 style={{
                     position: 'absolute',
@@ -217,6 +216,7 @@ export const Game = ({ user, logout, game }) => {
                 ball={game.board.ball}
                 winner={game.winner}
                 countdown={game.countdown}
+                state={game.state}
             />
             <ScoreBoard
                 gameId={game._id}

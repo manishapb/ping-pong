@@ -10,6 +10,8 @@ export const padHeightRatio = 0.25;
 
 export const ballXRatio = 0.02;
 
+export const activeGameState = 'ongoing';
+
 
 // backend constants
 export const FPS = 20;

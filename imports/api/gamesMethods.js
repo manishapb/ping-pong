@@ -119,7 +119,6 @@ Meteor.methods({
         countDownLoops[gameId] = i;
     },
     'games.start'(gameId) {
-        let player2 = Meteor.userId();
         let game = GameCollection.findOne({ _id: gameId });
 
         Meteor.setTimeout(() => {
@@ -128,7 +127,7 @@ Meteor.methods({
             Meteor.users.remove({
                 $or: [
                     { _id: game.player1 },
-                    { _id: player2 },
+                    { _id: game.player2 },
                 ]
             });
         }, gameAliveTimeout);
@@ -224,10 +223,12 @@ Meteor.methods({
             // if ended
             if (rPadScore === maxScore || lPadScore === maxScore) {
                 updates['state'] = "ended";
-                updates['winner'] = lPadScore === maxScore ? game.player1 : player2;
+                updates['winner'] = lPadScore === maxScore ? 
+                    game.player1
+                    : game.player2;
                 clearInterval(activeGameLoops[gameId]);
             }
-
+            console.log("updating");
             GameCollection.update(
                 { _id: gameId },
                 { $set: updates }
