@@ -25,30 +25,18 @@ const randomBallVel = () => {
     return ballVel * (Math.random() > 0.5 ? 1 : -1);
 }
 
-const isColliding = (x1, y1, w1, h1, x2, y2, w2, h2) => {
-    function boxContainsPoint(boxX, boxY, boxW, boxH, pointX, pointY) {
-        return boxX <= pointX && pointX <= boxX + boxW
-            && boxY <= pointY && pointY <= boxY + boxH;
-    }
+function isColliding(x1, y1, w1, h1, x2, y2, w2, h2) {
+    const isALeftOfB = () => (x1 + w1 < x2);
+    const isARightOfB = () => (x1 > x2 + w2);
+    const isAAboveB = () => (y1 + h1 < y2);
+    const isABelowB = () => (y1 > y2 + h2);
 
-    function getBoxPoints(x, y, w, h) {
-        return [
-            [x, y],
-            [x + w, y],
-            [x + w, y + h],
-            [x, y + h]
-        ];
-    }
-
-    function box2ContainsBox1Points(x1, y1, w1, h1, x2, y2, w2, h2) {
-        return getBoxPoints(x1, y1, w1, h1)
-            .map(([x, y]) => boxContainsPoint(x2, y2, w2, h2, x, y))
-            .reduce((acc, x) => acc || x, false);
-    }
-
-    return box2ContainsBox1Points(x1, y1, w1, h1, x2, y2, w2, h2)
-        || box2ContainsBox1Points(x2, y2, w2, h2, x1, y1, w1, h1);
+    return !isALeftOfB()
+        && !isARightOfB()
+        && !isAAboveB()
+        && !isABelowB();
 }
+
 
 Meteor.methods({
     'games.new'() {
@@ -104,7 +92,7 @@ Meteor.methods({
 
         let countdown = game.countdown;
 
-        let i = Meteor.setInterval(()=> {
+        let i = Meteor.setInterval(() => {
             countdown = countdown - 1;
             if (countdown <= 0) {
                 clearInterval(countDownLoops[gameId]);
@@ -112,8 +100,8 @@ Meteor.methods({
             }
 
             GameCollection.update(
-                { _id: gameId},
-                { $set : { countdown: countdown}}
+                { _id: gameId },
+                { $set: { countdown: countdown } }
             );
         }, 1000);
         countDownLoops[gameId] = i;
@@ -223,19 +211,17 @@ Meteor.methods({
             // if ended
             if (rPadScore === maxScore || lPadScore === maxScore) {
                 updates['state'] = "ended";
-                updates['winner'] = lPadScore === maxScore ? 
+                updates['winner'] = lPadScore === maxScore ?
                     game.player1
                     : game.player2;
                 clearInterval(activeGameLoops[gameId]);
             }
-            console.log("updating");
             GameCollection.update(
                 { _id: gameId },
                 { $set: updates }
             );
         }, gameInterval);
         activeGameLoops[gameId] = i;
-
     },
     'games.move'(dir, gameId, userId, player) {
         check(player, Number);
