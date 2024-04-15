@@ -223,6 +223,14 @@ export const Game = ({ user, logout, game }) => {
                 gameState={game.state}
                 player={player}
                 logout={logout} />
+            {/* <div 
+                style={{
+                    position: 'absolute',
+                    left: boardX + boardWidth/2,
+                    top: boardY + boardHeight + 5
+                }}>
+                {game.board.ball.velX} , {game.board.ball.velY}
+            </div> */}
         </>
     );
 }

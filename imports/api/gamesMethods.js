@@ -2,19 +2,18 @@ import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import {
     ballHeight,
+    ballVel,
     ballWidth,
     boardWidth,
-    gameInterval,
     gameAliveTimeout,
-    FPS,
+    gameInterval,
     initBallX, initBallY,
     lPadX,
     maxBallX, maxPadY,
     maxScore,
     minBallX,
     minPadY, paddleHeight, paddleVel,
-    paddleWidth,
-    ballVel
+    paddleWidth
 } from '../constants';
 import { GameCollection } from '/imports/db/Collections';
 
@@ -25,18 +24,17 @@ const randomBallVel = () => {
     return ballVel * (Math.random() > 0.5 ? 1 : -1);
 }
 
-function isColliding(x1, y1, w1, h1, x2, y2, w2, h2) {
-    const isALeftOfB = () => (x1 + w1 < x2);
-    const isARightOfB = () => (x1 > x2 + w2);
-    const isAAboveB = () => (y1 + h1 < y2);
-    const isABelowB = () => (y1 > y2 + h2);
-
-    return !isALeftOfB()
-        && !isARightOfB()
-        && !isAAboveB()
-        && !isABelowB();
+function collidesLPad(ballX, ballY, ballW, ballH, lPadX, lPadY, lPadW, lPadH) {
+    return ballX < (lPadX + lPadW)
+        && ballY + ballH > lPadY
+        && ballY < lPadY + lPadH;
 }
 
+function collidesRPad(ballX, ballY, ballW, ballH, rPadX, rPadY, rPadW, rPadH) {
+    return ballX + ballW > rPadX
+        && ballY + ballH > rPadY
+        && ballY < rPadY + rPadH;
+}
 
 Meteor.methods({
     'games.new'() {
@@ -185,17 +183,19 @@ Meteor.methods({
 
             // bounce ball from paddles
             let rPadX = boardWidth - paddleWidth;
-            if (isColliding(
+            if (collidesLPad(
                 ballX, ballY, ballWidth, ballHeight,
                 lPadX, lPadY, paddleWidth, paddleHeight
             )) {
-                ballVelX = -ballVelX;
+                ballVelX = ballVelX * -1 * 1.1;
+                ballVelY = ballVelY * 1.1;
                 ballX = 1.5 * paddleWidth;
-            } else if (isColliding(
+            } else if (collidesRPad(
                 ballX, ballY, ballWidth, ballHeight,
                 rPadX, rPadY, paddleWidth, paddleHeight
             )) {
-                ballVelX = -ballVelX;
+                ballVelX = ballVelX * -1 * 1.1;
+                ballVelY = ballVelY * 1.1;
                 ballX = boardWidth - 1.5 * paddleWidth - ballWidth;
             }
 
